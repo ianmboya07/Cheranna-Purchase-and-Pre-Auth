@@ -75,8 +75,8 @@ app.use('/api/', limiter);
 app.use('/api/create-payment-intent', paymentLimiter);
 app.use('/api/capture-payment', paymentLimiter);
 
-// Database Initialization
-const dbPath = process.env.NODE_ENV === 'production' ? '/data/transactions.db' : './transactions.db';
+// Database Initialization - FIXED PATH FOR RENDER
+const dbPath = process.env.NODE_ENV === 'production' ? '/tmp/transactions.db' : './transactions.db';
 const db = new sqlite3.Database(dbPath);
 
 db.serialize(() => {
