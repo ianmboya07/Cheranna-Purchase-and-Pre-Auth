@@ -1,0 +1,2180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cheranna SoftPOS - Complete Payment Solution</title>
+    <meta name="description" content="Secure payment processing with pre-authorization, capture, and MOTO payments">
+    <style>
+        :root {
+            --primary: #1e6fba;
+            --primary-dark: #155d9d;
+            --primary-light: #4a90e2;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f7ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            position: relative;
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e9ecef;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            cursor: pointer;
+            font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 25px;
+            border-radius: var(--border-radius);
+            background: var(--light);
+            border: 1px solid #e9ecef;
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h2 i {
+            font-size: 1.2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .required::after {
+            content: " *";
+            color: var(--danger);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: var(--transition);
+            background: white;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 111, 186, 0.1);
+        }
+        
+        input.error, select.error, textarea.error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
+        
+        .currency-input {
+            display: flex;
+            align-items: center;
+        }
+        
+        .currency-symbol {
+            background: #e9ecef;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-right: none;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .currency-input input {
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        
+        .error {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .error.show {
+            display: block;
+        }
+        
+        .order-summary {
+            background: #e8f4ff;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            border: 1px solid #cfe2ff;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+        
+        .total {
+            font-weight: 700;
+            font-size: 1.2rem;
+            border-top: 2px solid #b6d4fe;
+            padding-top: 15px;
+            margin-top: 10px;
+            color: var(--primary);
+        }
+        
+        .transaction-type-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .transaction-type-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius);
+            background: white;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 16px;
+        }
+        
+        .transaction-type-btn:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        
+        .transaction-type-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 8px rgba(30, 111, 186, 0.3);
+        }
+        
+        .transaction-type-btn.warning.active {
+            border-color: var(--warning);
+            background: var(--warning);
+            color: var(--dark);
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+        }
+        
+        .transaction-type-btn.info.active {
+            border-color: var(--info);
+            background: var(--info);
+            color: white;
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+        }
+        
+        .transaction-info {
+            background: #fff9e6;
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .transaction-info.info {
+            background: #e6f7ff;
+            border-left-color: var(--info);
+        }
+        
+        .transaction-info.show {
+            display: block;
+        }
+        
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            border-radius: var(--border-radius);
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button:hover:not(:disabled) {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            background: var(--secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        button.warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        
+        button.warning:hover:not(:disabled) {
+            background: #e0a800;
+        }
+        
+        button.success {
+            background: var(--success);
+            color: white;
+        }
+        
+        button.success:hover:not(:disabled) {
+            background: #218838;
+        }
+        
+        button.info {
+            background: var(--info);
+            color: white;
+        }
+        
+        button.info:hover:not(:disabled) {
+            background: #138496;
+        }
+        
+        #payment-message, #capture-message, #moto-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: var(--border-radius);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .warning-message {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .info-message {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        button.warning .loading-spinner {
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-top: 3px solid var(--dark);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .security-badge {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            color: var(--secondary);
+            font-size: 14px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .security-badge i {
+            color: var(--success);
+            margin-right: 5px;
+        }
+        
+        .pending-transactions {
+            margin-top: 30px;
+        }
+        
+        .transaction-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #e9ecef;
+            border-radius: var(--border-radius);
+        }
+        
+        .transaction-item {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+        
+        .transaction-details {
+            flex: 1;
+        }
+        
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+        
+        .transaction-id {
+            font-size: 0.85rem;
+            color: var(--secondary);
+            margin-top: 5px;
+        }
+        
+        .transaction-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 14px;
+            width: auto;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--secondary);
+        }
+        
+        .approval-code {
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+            font-size: 0.85rem;
+            color: var(--dark);
+            margin-top: 5px;
+            display: inline-block;
+        }
+        
+        .approval-code-label {
+            font-weight: 600;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-right: 5px;
+        }
+        
+        .approval-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #dee2e6;
+        }
+        
+        .card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .card-details .form-group:first-child {
+            grid-column: span 2;
+        }
+        
+        .StripeElement {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            background: white;
+            transition: var(--transition);
+        }
+        
+        .StripeElement--focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 111, 186, 0.1);
+        }
+        
+        .StripeElement--invalid {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+        }
+        
+        .moto-card-input {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            height: auto !important;
+            width: 100% !important;
+            position: static !important;
+            transform: none !important;
+        }
+        
+        #moto-card-number,
+        #moto-card-expiry,
+        #moto-card-cvc,
+        #manual-approval-code {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            height: auto !important;
+            width: 100% !important;
+            position: static !important;
+            transform: none !important;
+        }
+        
+        .billing-section {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .billing-section .form-group {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .billing-section input,
+        .billing-section select {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        
+        .offline-section {
+            background: #fff3cd;
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        
+        .offline-section h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.95);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        #loading-overlay .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        #loading-overlay p {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        #connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+            display: none;
+            font-weight: 600;
+        }
+        
+        #connection-status.online {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        #connection-status.offline {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        #connection-status.test-mode {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        #connection-status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        #connection-status.processing {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b3d7ff;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .transaction-type-selector {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .card-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-details .form-group:first-child {
+                grid-column: span 1;
+            }
+            
+            h1 {
+                font-size: 1.75rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .transaction-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .transaction-actions {
+                margin-top: 10px;
+                width: 100%;
+            }
+            
+            .btn-small {
+                flex: 1;
+            }
+            
+            #connection-status {
+                top: 5px;
+                right: 5px;
+                padding: 6px 10px;
+                font-size: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .section {
+                padding: 15px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                border-bottom: 1px solid #e9ecef;
+                border-left: 3px solid transparent;
+            }
+            
+            .tab.active {
+                border-left: 3px solid var(--primary);
+                border-bottom: 1px solid #e9ecef;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p id="loading-text">Initializing Secure Payment System...</p>
+    </div>
+
+    <div id="connection-status"></div>
+
+    <div class="container">
+        <h1>Cheranna SoftPOS</h1>
+        
+        <div class="tabs" role="tablist" aria-label="Payment Processing Functions">
+            <div class="tab active" data-tab="payment" role="tab" aria-selected="true" aria-controls="payment-tab">Process Payment</div>
+            <div class="tab" data-tab="moto" role="tab" aria-selected="false" aria-controls="moto-tab">MOTO Payments</div>
+            <div class="tab" data-tab="capture" role="tab" aria-selected="false" aria-controls="capture-tab">Complete Authorization</div>
+            <div class="tab" data-tab="transactions" role="tab" aria-selected="false" aria-controls="transactions-tab">Transaction History</div>
+        </div>
+        
+        <div class="tab-content active" id="payment-tab" role="tabpanel" aria-labelledby="payment-tab">
+            <div class="section">
+                <h2>Order Summary</h2>
+                
+                <div class="transaction-type-selector" role="radiogroup" aria-label="Select transaction type">
+                    <div class="transaction-type-btn active" data-type="payment" id="payment-btn" role="radio" aria-checked="true" tabindex="0">
+                        Payment
+                    </div>
+                    <div class="transaction-type-btn warning" data-type="pre-auth" id="pre-auth-btn" role="radio" aria-checked="false" tabindex="0">
+                        Pre-Authorization
+                    </div>
+                </div>
+                
+                <div class="transaction-info" id="pre-auth-info" role="status" aria-live="polite">
+                    <strong>Pre-Authorization Notice:</strong> This will reserve funds on the customer's card but will not charge them immediately. You'll need to capture the funds later to complete the transaction.
+                </div>
+                
+                <div class="form-group">
+                    <label for="amount" class="required">Payment Amount (USD)</label>
+                    <div class="currency-input">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="amount" placeholder="0" inputmode="numeric" min="1" step="1" required
+                               aria-describedby="amount-error" aria-required="true">
+                    </div>
+                    <div id="amount-error" class="error" role="alert">Please enter a valid whole dollar amount (minimum $1)</div>
+                </div>
+                
+                <div class="order-summary" aria-live="polite">
+                    <div class="summary-item">
+                        <span>Amount:</span>
+                        <span id="display-amount">$0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Transaction Type:</span>
+                        <span id="display-type">Payment</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Total:</span>
+                        <span id="display-total">$0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section billing-section">
+                <h2>Billing Information</h2>
+                <div class="form-group">
+                    <label for="name" class="required">Full Name</label>
+                    <input type="text" id="name" placeholder="John Doe" required maxlength="100"
+                           aria-describedby="name-error" aria-required="true">
+                    <div id="name-error" class="error" role="alert">Please enter your full name (max 100 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email" class="required">Email Address</label>
+                    <input type="email" id="email" placeholder="john.doe@example.com" required maxlength="100"
+                           aria-describedby="email-error" aria-required="true">
+                    <div id="email-error" class="error" role="alert">Please enter a valid email address</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="line1" class="required">Address Line 1</label>
+                    <input type="text" id="line1" placeholder="123 Main St" required maxlength="200"
+                           aria-describedby="line1-error" aria-required="true">
+                    <div id="line1-error" class="error" role="alert">Please enter your address (max 200 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="line2">Address Line 2 (Optional)</label>
+                    <input type="text" id="line2" placeholder="Apt 456" maxlength="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="city" class="required">City</label>
+                    <input type="text" id="city" placeholder="New York" required maxlength="50"
+                           aria-describedby="city-error" aria-required="true">
+                    <div id="city-error" class="error" role="alert">Please enter your city (max 50 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="state" class="required">State/Province/Region</label>
+                    <input type="text" id="state" placeholder="NY" required maxlength="50"
+                           aria-describedby="state-error" aria-required="true">
+                    <div id="state-error" class="error" role="alert">Please enter your state/region (max 50 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="postal_code" class="required">Postal Code</label>
+                    <input type="text" id="postal_code" placeholder="10001" required maxlength="20"
+                           aria-describedby="postal-code-error" aria-required="true">
+                    <div id="postal-code-error" class="error" role="alert">Please enter your postal code</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="country" class="required">Country</label>
+                    <select id="country" required aria-describedby="country-error" aria-required="true">
+                        <option value="">Select a country</option>
+                    </select>
+                    <div id="country-error" class="error" role="alert">Please select your country</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Payment Details</h2>
+                <div class="form-group">
+                    <label for="card-element" class="required">Credit or Debit Card</label>
+                    <div id="card-element" aria-describedby="card-errors" aria-required="true"></div>
+                    <div id="card-errors" class="error" role="alert"></div>
+                </div>
+                
+                <button id="submit-button" disabled aria-describedby="payment-message">
+                    <div id="spinner" class="loading-spinner"></div>
+                    <span id="button-text">Pay $0</span>
+                </button>
+                
+                <div id="payment-message" role="alert" aria-live="polite"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="moto-tab" role="tabpanel" aria-labelledby="moto-tab" hidden>
+            <div class="section">
+                <h2>MOTO Payment (Mail Order/Telephone Order)</h2>
+                
+                <div class="transaction-info info show" role="status" aria-live="polite">
+                    <strong>MOTO Payment Information:</strong> Use this form for card-not-present transactions such as phone orders, mail orders, or invoice payments. These transactions are marked as MOTO to exempt them from Strong Customer Authentication (SCA) requirements.
+                </div>
+                
+                <div class="form-group">
+                    <label for="moto-amount" class="required">Payment Amount (USD)</label>
+                    <div class="currency-input">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="moto-amount" placeholder="0" inputmode="numeric" min="1" step="1" required
+                               aria-describedby="moto-amount-error" aria-required="true">
+                    </div>
+                    <div id="moto-amount-error" class="error" role="alert">Please enter a valid whole dollar amount (minimum $1)</div>
+                </div>
+                
+                <div class="transaction-type-selector" role="radiogroup" aria-label="Select MOTO transaction type">
+                    <div class="transaction-type-btn active" data-type="moto-payment" id="moto-payment-btn" role="radio" aria-checked="true" tabindex="0">
+                        MOTO Payment
+                    </div>
+                    <div class="transaction-type-btn info" data-type="moto-pre-auth" id="moto-pre-auth-btn" role="radio" aria-checked="false" tabindex="0">
+                        MOTO Pre-Authorization
+                    </div>
+                </div>
+                
+                <div class="order-summary" aria-live="polite">
+                    <div class="summary-item">
+                        <span>Amount:</span>
+                        <span id="moto-display-amount">$0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Transaction Type:</span>
+                        <span id="moto-display-type">MOTO Payment</span>
+                    </div>
+                    <div class="summary-item total">
+                        <span>Total:</span>
+                        <span id="moto-display-total">$0</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section billing-section">
+                <h2>Billing Information</h2>
+                <div class="form-group">
+                    <label for="moto-name" class="required">Full Name</label>
+                    <input type="text" id="moto-name" placeholder="John Doe" required maxlength="100"
+                           aria-describedby="moto-name-error" aria-required="true">
+                    <div id="moto-name-error" class="error" role="alert">Please enter your full name (max 100 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="moto-email" class="required">Email Address</label>
+                    <input type="email" id="moto-email" placeholder="john.doe@example.com" required maxlength="100"
+                           aria-describedby="moto-email-error" aria-required="true">
+                    <div id="moto-email-error" class="error" role="alert">Please enter a valid email address</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="moto-line1" class="required">Address Line 1</label>
+                    <input type="text" id="moto-line1" placeholder="123 Main St" required maxlength="200"
+                           aria-describedby="moto-line1-error" aria-required="true">
+                    <div id="moto-line1-error" class="error" role="alert">Please enter your address (max 200 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="moto-line2">Address Line 2 (Optional)</label>
+                    <input type="text" id="moto-line2" placeholder="Apt 456" maxlength="100">
+                </div>
+                
+                <div class="form-group">
+                    <label for="moto-city" class="required">City</label>
+                    <input type="text" id="moto-city" placeholder="New York" required maxlength="50"
+                           aria-describedby="moto-city-error" aria-required="true">
+                    <div id="moto-city-error" class="error" role="alert">Please enter your city (max 50 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="moto-state" class="required">State/Province/Region</label>
+                    <input type="text" id="moto-state" placeholder="NY" required maxlength="50"
+                           aria-describedby="moto-state-error" aria-required="true">
+                    <div id="moto-state-error" class="error" role="alert">Please enter your state/region (max 50 characters)</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="moto-postal_code" class="required">Postal Code</label>
+                    <input type="text" id="moto-postal_code" placeholder="10001" required maxlength="20"
+                           aria-describedby="moto-postal-code-error" aria-required="true">
+                    <div id="moto-postal-code-error" class="error" role="alert">Please enter your postal code</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="moto-country" class="required">Country</label>
+                    <select id="moto-country" required aria-describedby="moto-country-error" aria-required="true">
+                        <option value="">Select a country</option>
+                    </select>
+                    <div id="moto-country-error" class="error" role="alert">Please select your country</div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Card Details</h2>
+                <div class="card-details">
+                    <div class="form-group">
+                        <label for="moto-card-number" class="required">Card Number</label>
+                        <input type="text" id="moto-card-number" class="moto-card-input" placeholder="4242 4242 4242 4242" required maxlength="19" inputmode="numeric"
+                               aria-describedby="moto-card-number-error" aria-required="true">
+                        <div id="moto-card-number-error" class="error" role="alert">Please enter a valid card number</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="moto-card-expiry" class="required">Expiry Date</label>
+                        <input type="text" id="moto-card-expiry" class="moto-card-input" placeholder="MM/YY" required maxlength="5"
+                               aria-describedby="moto-card-expiry-error" aria-required="true">
+                        <div id="moto-card-expiry-error" class="error" role="alert">Please enter a valid expiry date (MM/YY)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="moto-card-cvc" class="required">CVC</label>
+                        <input type="text" id="moto-card-cvc" class="moto-card-input" placeholder="123" required maxlength="4" inputmode="numeric"
+                               aria-describedby="moto-card-cvc-error" aria-required="true">
+                        <div id="moto-card-cvc-error" class="error" role="alert">Please enter a valid CVC</div>
+                    </div>
+                </div>
+
+                <div class="offline-section">
+                    <h3>Offline Transaction Support</h3>
+                    <p>Use this section for voice authorizations or manual transactions where you need to record an approval code provided by the processor.</p>
+                    
+                    <div class="form-group">
+                        <label for="manual-approval-code">Manual Approval Code (Offline Only)</label>
+                        <input type="text" id="manual-approval-code" placeholder="A12345" maxlength="10"
+                               aria-describedby="manual-approval-code-help">
+                        <div class="error" id="manual-approval-code-help">For voice authorizations or offline terminals only</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="offline-notes">Offline Transaction Notes</label>
+                        <textarea id="offline-notes" placeholder="Additional notes about this offline transaction..." rows="3" maxlength="500"></textarea>
+                    </div>
+                </div>
+                
+                <button id="moto-submit-button" class="info" disabled aria-describedby="moto-message">
+                    <div id="moto-spinner" class="loading-spinner"></div>
+                    <span id="moto-button-text">Process MOTO Payment</span>
+                </button>
+                
+                <div id="moto-message" role="alert" aria-live="polite"></div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="capture-tab" role="tabpanel" aria-labelledby="capture-tab" hidden>
+            <div class="section">
+                <h2>Complete Authorization</h2>
+                <div class="form-group">
+                    <label for="payment-intent-id" class="required">Payment Intent ID</label>
+                    <input type="text" id="payment-intent-id" placeholder="pi_xxxxxxxxxxxxx" required pattern="pi_[a-zA-Z0-9_]+"
+                           aria-describedby="payment-intent-id-error" aria-required="true">
+                    <div id="payment-intent-id-error" class="error" role="alert">Please enter a valid Payment Intent ID starting with "pi_"</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="capture-amount" class="required">Capture Amount (USD)</label>
+                    <div class="currency-input">
+                        <span class="currency-symbol">$</span>
+                        <input type="number" id="capture-amount" placeholder="0" inputmode="numeric" min="1" step="1" required
+                               aria-describedby="capture-amount-error" aria-required="true">
+                    </div>
+                    <div id="capture-amount-error" class="error" role="alert">Please enter a valid amount to capture (minimum $1)</div>
+                </div>
+                
+                <button id="capture-button" class="success" aria-describedby="capture-message">
+                    <div id="capture-spinner" class="loading-spinner"></div>
+                    <span id="capture-button-text">Capture Funds</span>
+                </button>
+                
+                <div id="capture-message" role="alert" aria-live="polite"></div>
+            </div>
+            
+            <div class="section pending-transactions">
+                <h2>Recent Pre-Authorizations</h2>
+                <div class="transaction-list" id="transaction-list">
+                    <div class="empty-state">No recent pre-authorizations found</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-content" id="transactions-tab" role="tabpanel" aria-labelledby="transactions-tab" hidden>
+            <div class="section">
+                <h2>Transaction Management</h2>
+                <div class="form-group">
+                    <button id="refresh-transactions" class="success">
+                        Refresh Transactions
+                    </button>
+                </div>
+                
+                <div class="transaction-list" id="all-transactions-list">
+                    <div class="empty-state">No transactions found</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="security-badge">
+            <i>🔒</i> <span id="environment-badge">Secure SSL Encryption</span> • PCI DSS Compliant
+        </div>
+    </div>
+
+    <script>
+        let CONFIG = {
+            stripePublishableKey: null,
+            backendUrl: null,
+            environment: 'development'
+        };
+
+        let stripe = null;
+        let cardElement = null;
+        let transactionType = 'payment';
+        let motoTransactionType = 'moto-payment';
+        
+        const COUNTRIES = [
+            {code: 'AF', name: 'Afghanistan'}, {code: 'AL', name: 'Albania'}, {code: 'DZ', name: 'Algeria'}, 
+            {code: 'AD', name: 'Andorra'}, {code: 'AO', name: 'Angola'}, {code: 'AG', name: 'Antigua and Barbuda'}, 
+            {code: 'AR', name: 'Argentina'}, {code: 'AM', name: 'Armenia'}, {code: 'AU', name: 'Australia'}, 
+            {code: 'AT', name: 'Austria'}, {code: 'AZ', name: 'Azerbaijan'}, {code: 'BS', name: 'Bahamas'}, 
+            {code: 'BH', name: 'Bahrain'}, {code: 'BD', name: 'Bangladesh'}, {code: 'BB', name: 'Barbados'}, 
+            {code: 'BY', name: 'Belarus'}, {code: 'BE', name: 'Belgium'}, {code: 'BZ', name: 'Belize'}, 
+            {code: 'BJ', name: 'Benin'}, {code: 'BT', name: 'Bhutan'}, {code: 'BO', name: 'Bolivia'}, 
+            {code: 'BA', name: 'Bosnia and Herzegovina'}, {code: 'BW', name: 'Botswana'}, {code: 'BR', name: 'Brazil'}, 
+            {code: 'BN', name: 'Brunei Darussalam'}, {code: 'BG', name: 'Bulgaria'}, {code: 'BF', name: 'Burkina Faso'}, 
+            {code: 'BI', name: 'Burundi'}, {code: 'CV', name: 'Cabo Verde'}, {code: 'KH', name: 'Cambodia'}, 
+            {code: 'CM', name: 'Cameroon'}, {code: 'CA', name: 'Canada'}, {code: 'CF', name: 'Central African Republic'}, 
+            {code: 'TD', name: 'Chad'}, {code: 'CL', name: 'Chile'}, {code: 'CN', name: 'China'}, 
+            {code: 'CO', name: 'Colombia'}, {code: 'KM', name: 'Comoros'}, {code: 'CG', name: 'Congo'}, 
+            {code: 'CD', name: 'Congo, Democratic Republic of the'}, {code: 'CR', name: 'Costa Rica'}, 
+            {code: 'CI', name: 'Côte d\'Ivoire'}, {code: 'HR', name: 'Croatia'}, {code: 'CU', name: 'Cuba'}, 
+            {code: 'CY', name: 'Cyprus'}, {code: 'CZ', name: 'Czech Republic'}, {code: 'DK', name: 'Denmark'}, 
+            {code: 'DJ', name: 'Djibouti'}, {code: 'DM', name: 'Dominica'}, {code: 'DO', name: 'Dominican Republic'}, 
+            {code: 'EC', name: 'Ecuador'}, {code: 'EG', name: 'Egypt'}, {code: 'SV', name: 'El Salvador'}, 
+            {code: 'GQ', name: 'Equatorial Guinea'}, {code: 'ER', name: 'Eritrea'}, {code: 'EE', name: 'Estonia'}, 
+            {code: 'SZ', name: 'Eswatini'}, {code: 'ET', name: 'Ethiopia'}, {code: 'FJ', name: 'Fiji'}, 
+            {code: 'FI', name: 'Finland'}, {code: 'FR', name: 'France'}, {code: 'GA', name: 'Gabon'}, 
+            {code: 'GM', name: 'Gambia'}, {code: 'GE', name: 'Georgia'}, {code: 'DE', name: 'Germany'}, 
+            {code: 'GH', name: 'Ghana'}, {code: 'GR', name: 'Greece'}, {code: 'GD', name: 'Grenada'}, 
+            {code: 'GT', name: 'Guatemala'}, {code: 'GN', name: 'Guinea'}, {code: 'GW', name: 'Guinea-Bissau'}, 
+            {code: 'GY', name: 'Guyana'}, {code: 'HT', name: 'Haiti'}, {code: 'HN', name: 'Honduras'}, 
+            {code: 'HU', name: 'Hungary'}, {code: 'IS', name: 'Iceland'}, {code: 'IN', name: 'India'}, 
+            {code: 'ID', name: 'Indonesia'}, {code: 'IR', name: 'Iran'}, {code: 'IQ', name: 'Iraq'}, 
+            {code: 'IE', name: 'Ireland'}, {code: 'IL', name: 'Israel'}, {code: 'IT', name: 'Italy'}, 
+            {code: 'JM', name: 'Jamaica'}, {code: 'JP', name: 'Japan'}, {code: 'JO', name: 'Jordan'}, 
+            {code: 'KZ', name: 'Kazakhstan'}, {code: 'KE', name: 'Kenya'}, {code: 'KI', name: 'Kiribati'}, 
+            {code: 'KP', name: 'Korea, Democratic People\'s Republic of'}, {code: 'KR', name: 'Korea, Republic of'}, 
+            {code: 'KW', name: 'Kuwait'}, {code: 'KG', name: 'Kyrgyzstan'}, {code: 'LA', name: 'Lao People\'s Democratic Republic'}, 
+            {code: 'LV', name: 'Latvia'}, {code: 'LB', name: 'Lebanon'}, {code: 'LS', name: 'Lesotho'}, 
+            {code: 'LR', name: 'Liberia'}, {code: 'LY', name: 'Libya'}, {code: 'LI', name: 'Liechtenstein'}, 
+            {code: 'LT', name: 'Lithuania'}, {code: 'LU', name: 'Luxembourg'}, {code: 'MG', name: 'Madagascar'}, 
+            {code: 'MW', name: 'Malawi'}, {code: 'MY', name: 'Malaysia'}, {code: 'MV', name: 'Maldives'}, 
+            {code: 'ML', name: 'Mali'}, {code: 'MT', name: 'Malta'}, {code: 'MH', name: 'Marshall Islands'}, 
+            {code: 'MR', name: 'Mauritania'}, {code: 'MU', name: 'Mauritius'}, {code: 'MX', name: 'Mexico'}, 
+            {code: 'FM', name: 'Micronesia'}, {code: 'MD', name: 'Moldova'}, {code: 'MC', name: 'Monaco'}, 
+            {code: 'MN', name: 'Mongolia'}, {code: 'ME', name: 'Montenegro'}, {code: 'MA', name: 'Morocco'}, 
+            {code: 'MZ', name: 'Mozambique'}, {code: 'MM', name: 'Myanmar'}, {code: 'NA', name: 'Namibia'}, 
+            {code: 'NR', name: 'Nauru'}, {code: 'NP', name: 'Nepal'}, {code: 'NL', name: 'Netherlands'}, 
+            {code: 'NZ', name: 'New Zealand'}, {code: 'NI', name: 'Nicaragua'}, {code: 'NE', name: 'Niger'}, 
+            {code: 'NG', name: 'Nigeria'}, {code: 'MK', name: 'North Macedonia'}, {code: 'NO', name: 'Norway'}, 
+            {code: 'OM', name: 'Oman'}, {code: 'PK', name: 'Pakistan'}, {code: 'PW', name: 'Palau'}, 
+            {code: 'PA', name: 'Panama'}, {code: 'PG', name: 'Papua New Guinea'}, {code: 'PY', name: 'Paraguay'}, 
+            {code: 'PE', name: 'Peru'}, {code: 'PH', name: 'Philippines'}, {code: 'PL', name: 'Poland'}, 
+            {code: 'PT', name: 'Portugal'}, {code: 'QA', name: 'Qatar'}, {code: 'RO', name: 'Romania'}, 
+            {code: 'RU', name: 'Russian Federation'}, {code: 'RW', name: 'Rwanda'}, {code: 'KN', name: 'Saint Kitts and Nevis'}, 
+            {code: 'LC', name: 'Saint Lucia'}, {code: 'VC', name: 'Saint Vincent and the Grenadines'}, 
+            {code: 'WS', name: 'Samoa'}, {code: 'SM', name: 'San Marino'}, {code: 'ST', name: 'Sao Tome and Principe'}, 
+            {code: 'SA', name: 'Saudi Arabia'}, {code: 'SN', name: 'Senegal'}, {code: 'RS', name: 'Serbia'}, 
+            {code: 'SC', name: 'Seychelles'}, {code: 'SL', name: 'Sierra Leone'}, {code: 'SG', name: 'Singapore'}, 
+            {code: 'SK', name: 'Slovakia'}, {code: 'SI', name: 'Slovenia'}, {code: 'SB', name: 'Solomon Islands'}, 
+            {code: 'SO', name: 'Somalia'}, {code: 'ZA', name: 'South Africa'}, {code: 'SS', name: 'South Sudan'}, 
+            {code: 'ES', name: 'Spain'}, {code: 'LK', name: 'Sri Lanka'}, {code: 'SD', name: 'Sudan'}, 
+            {code: 'SR', name: 'Suriname'}, {code: 'SE', name: 'Sweden'}, {code: 'CH', name: 'Switzerland'}, 
+            {code: 'SY', name: 'Syrian Arab Republic'}, {code: 'TW', name: 'Taiwan'}, {code: 'TJ', name: 'Tajikistan'}, 
+            {code: 'TZ', name: 'Tanzania'}, {code: 'TH', name: 'Thailand'}, {code: 'TL', name: 'Timor-Leste'}, 
+            {code: 'TG', name: 'Togo'}, {code: 'TO', name: 'Tonga'}, {code: 'TT', name: 'Trinidad and Tobago'}, 
+            {code: 'TN', name: 'Tunisia'}, {code: 'TR', name: 'Turkey'}, {code: 'TM', name: 'Turkmenistan'}, 
+            {code: 'TV', name: 'Tuvalu'}, {code: 'UG', name: 'Uganda'}, {code: 'UA', name: 'Ukraine'}, 
+            {code: 'AE', name: 'United Arab Emirates'}, {code: 'GB', name: 'United Kingdom'}, {code: 'US', name: 'United States of America'}, 
+            {code: 'UY', name: 'Uruguay'}, {code: 'UZ', name: 'Uzbekistan'}, {code: 'VU', name: 'Vanuatu'}, 
+            {code: 'VA', name: 'Vatican City'}, {code: 'VE', name: 'Venezuela'}, {code: 'VN', name: 'Viet Nam'}, 
+            {code: 'YE', name: 'Yemen'}, {code: 'ZM', name: 'Zambia'}, {code: 'ZW', name: 'Zimbabwe'}
+        ];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApplication();
+        });
+        
+        async function initializeApplication() {
+            showLoadingOverlay('Initializing Secure Payment System...');
+            updateConnectionStatus('initializing');
+            
+            try {
+                await loadSecureConfig();
+                await loadStripeJS();
+                initializeStripe();
+                initializeCountrySelectors();
+                initializeTabs();
+                initializeTransactionTypeSelectors();
+                initializeAmountInputs();
+                initializeFormHandlers();
+                setupConnectionMonitoring();
+                
+                validateForm();
+                validateMotoForm();
+                
+                updateConnectionStatus('online');
+                setTimeout(() => {
+                    hideLoadingOverlay();
+                }, 1000);
+                
+                console.log('Cheranna SoftPOS securely initialized');
+            } catch (error) {
+                console.error('Secure initialization failed:', error);
+                updateConnectionStatus('error');
+                showMessage('payment-message', 'Security initialization failed. Please refresh the page.', 'error');
+                setTimeout(() => {
+                    hideLoadingOverlay();
+                }, 2000);
+            }
+        }
+        
+        async function loadSecureConfig() {
+            try {
+                let configUrl = '/api/config';
+                
+                const response = await fetch(configUrl);
+                if (!response.ok) {
+                    throw new Error(`Config fetch failed: ${response.status}`);
+                }
+                
+                const config = await response.json();
+                
+                if (!config.stripePublishableKey) {
+                    throw new Error('Invalid configuration: Missing Stripe key');
+                }
+                
+                CONFIG = {
+                    stripePublishableKey: config.stripePublishableKey,
+                    backendUrl: config.backendUrl || window.location.origin,
+                    environment: config.environment || 'production'
+                };
+                
+                console.log('Secure configuration loaded:', {
+                    environment: CONFIG.environment,
+                    backendUrl: CONFIG.backendUrl,
+                    hasStripeKey: !!CONFIG.stripePublishableKey
+                });
+                
+            } catch (error) {
+                console.error('Failed to load secure configuration:', error);
+                throw new Error('Cannot load secure payment configuration');
+            }
+        }
+        
+        function loadStripeJS() {
+            return new Promise((resolve, reject) => {
+                if (window.Stripe) {
+                    resolve();
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = 'https://js.stripe.com/v3/';
+                script.async = true;
+                script.defer = true;
+                
+                script.onload = () => {
+                    console.log('Stripe.js securely loaded');
+                    resolve();
+                };
+                
+                script.onerror = () => {
+                    reject(new Error('Failed to load Stripe.js'));
+                };
+                
+                document.head.appendChild(script);
+            });
+        }
+        
+        async function checkBackendHealth() {
+            try {
+                const response = await fetch(`${CONFIG.backendUrl}/api/health`);
+                if (!response.ok) {
+                    throw new Error(`Backend health check failed: ${response.status}`);
+                }
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Backend health check failed:', error);
+                throw new Error('Cannot connect to secure payment server');
+            }
+        }
+        
+        function initializeStripe() {
+            try {
+                if (!CONFIG.stripePublishableKey) {
+                    throw new Error('Stripe publishable key not configured securely');
+                }
+                
+                if (!window.Stripe) {
+                    throw new Error('Stripe.js not loaded');
+                }
+                
+                stripe = Stripe(CONFIG.stripePublishableKey);
+                
+                const elements = stripe.elements();
+                
+                cardElement = elements.create('card', {
+                    style: {
+                        base: {
+                            fontSize: '16px',
+                            color: '#32325d',
+                            fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+                            '::placeholder': {
+                                color: '#aab7c4'
+                            }
+                        },
+                        invalid: {
+                            color: '#dc3545'
+                        }
+                    },
+                    hidePostalCode: true
+                });
+                
+                cardElement.mount('#card-element');
+                
+                cardElement.on('change', function(event) {
+                    const displayError = document.getElementById('card-errors');
+                    if (event.error) {
+                        displayError.textContent = event.error.message;
+                        displayError.classList.add('show');
+                        validateForm();
+                    } else {
+                        displayError.textContent = '';
+                        displayError.classList.remove('show');
+                        validateForm();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Failed to initialize Stripe securely:', error);
+                throw error;
+            }
+        }
+        
+        function initializeCountrySelectors() {
+            const countrySelectors = ['country', 'moto-country'];
+            
+            countrySelectors.forEach(selectorId => {
+                const select = document.getElementById(selectorId);
+                if (select) {
+                    while (select.options.length > 1) {
+                        select.remove(1);
+                    }
+                    
+                    COUNTRIES.forEach(country => {
+                        const option = document.createElement('option');
+                        option.value = country.code;
+                        option.textContent = country.name;
+                        select.appendChild(option);
+                    });
+                    
+                    select.value = 'US';
+                }
+            });
+        }
+        
+        function initializeTabs() {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => {
+                        t.classList.remove('active');
+                        t.setAttribute('aria-selected', 'false');
+                    });
+                    this.classList.add('active');
+                    this.setAttribute('aria-selected', 'true');
+                    
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        content.setAttribute('hidden', 'true');
+                    });
+                    
+                    const activeContent = document.getElementById(`${tabId}-tab`);
+                    if (activeContent) {
+                        activeContent.classList.add('active');
+                        activeContent.removeAttribute('hidden');
+                    }
+                    
+                    if (tabId === 'capture' || tabId === 'transactions') {
+                        loadPendingTransactions();
+                    }
+                });
+            });
+        }
+        
+        function initializeTransactionTypeSelectors() {
+            document.querySelectorAll('.transaction-type-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (this.getAttribute('data-type').includes('moto')) return;
+                    
+                    document.querySelectorAll('.transaction-type-btn').forEach(btn => {
+                        if (!btn.getAttribute('data-type').includes('moto')) {
+                            btn.classList.remove('active');
+                            btn.setAttribute('aria-checked', 'false');
+                        }
+                    });
+                    
+                    this.classList.add('active');
+                    this.setAttribute('aria-checked', 'true');
+                    transactionType = this.getAttribute('data-type');
+                    updateTransactionUI();
+                });
+            });
+
+            document.querySelectorAll('#moto-tab .transaction-type-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('#moto-tab .transaction-type-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.setAttribute('aria-checked', 'false');
+                    });
+                    
+                    this.classList.add('active');
+                    this.setAttribute('aria-checked', 'true');
+                    motoTransactionType = this.getAttribute('data-type');
+                    updateMotoTransactionUI();
+                });
+            });
+        }
+        
+        function initializeAmountInputs() {
+            const amountInput = document.getElementById('amount');
+            if (amountInput) {
+                amountInput.addEventListener('input', function() {
+                    const amount = parseInt(this.value, 10) || 0;
+                    const displayAmount = document.getElementById('display-amount');
+                    const displayTotal = document.getElementById('display-total');
+                    
+                    if (displayAmount) displayAmount.textContent = `$${amount.toLocaleString()}`;
+                    if (displayTotal) displayTotal.textContent = `$${amount.toLocaleString()}`;
+                    
+                    updateButtonText();
+                    validateForm();
+                });
+            }
+
+            const motoAmountInput = document.getElementById('moto-amount');
+            if (motoAmountInput) {
+                motoAmountInput.addEventListener('input', function() {
+                    const amount = parseInt(this.value, 10) || 0;
+                    const displayAmount = document.getElementById('moto-display-amount');
+                    const displayTotal = document.getElementById('moto-display-total');
+                    
+                    if (displayAmount) displayAmount.textContent = `$${amount.toLocaleString()}`;
+                    if (displayTotal) displayTotal.textContent = `$${amount.toLocaleString()}`;
+                    
+                    updateMotoButtonText();
+                    validateMotoForm();
+                });
+            }
+        }
+        
+        function initializeFormHandlers() {
+            const submitButton = document.getElementById('submit-button');
+            if (submitButton) {
+                submitButton.addEventListener('click', handlePaymentSubmit);
+            }
+
+            const motoSubmitButton = document.getElementById('moto-submit-button');
+            if (motoSubmitButton) {
+                motoSubmitButton.addEventListener('click', handleMotoSubmit);
+            }
+
+            const captureButton = document.getElementById('capture-button');
+            if (captureButton) {
+                captureButton.addEventListener('click', handleCaptureSubmit);
+            }
+            
+            const refreshButton = document.getElementById('refresh-transactions');
+            if (refreshButton) {
+                refreshButton.addEventListener('click', function() {
+                    loadPendingTransactions();
+                    showMessage('capture-message', 'Transactions refreshed', 'success');
+                });
+            }
+            
+            document.querySelectorAll('input, select, textarea').forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.form && this.form.id.includes('moto')) {
+                        validateMotoForm();
+                    } else {
+                        validateForm();
+                    }
+                });
+            });
+        }
+        
+        async function handlePaymentSubmit(event) {
+            event.preventDefault();
+            
+            if (!validateForm()) {
+                showMessage('payment-message', 'Please fix the errors in the form before submitting.', 'error');
+                return;
+            }
+            
+            const submitButton = document.getElementById('submit-button');
+            const spinner = document.getElementById('spinner');
+            
+            submitButton.disabled = true;
+            if (spinner) spinner.style.display = 'block';
+            document.getElementById('button-text').textContent = 'Processing...';
+            updateConnectionStatus('processing');
+
+            try {
+                const amount = parseInt(document.getElementById('amount').value, 10);
+                const billingDetails = {
+                    name: document.getElementById('name').value.trim(),
+                    email: document.getElementById('email').value.trim(),
+                    address: {
+                        line1: document.getElementById('line1').value.trim(),
+                        line2: document.getElementById('line2').value.trim(),
+                        city: document.getElementById('city').value.trim(),
+                        state: document.getElementById('state').value.trim(),
+                        postal_code: document.getElementById('postal_code').value.trim(),
+                        country: document.getElementById('country').value,
+                    }
+                };
+
+                const { clientSecret, paymentIntentId, approvalCode } = await createPaymentIntent(
+                    amount,
+                    transactionType,
+                    billingDetails,
+                    false
+                );
+
+                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: cardElement,
+                        billing_details: billingDetails
+                    }
+                });
+
+                if (error) {
+                    throw new Error(error.message);
+                } else {
+                    handlePaymentSuccess(paymentIntent, approvalCode);
+                }
+
+            } catch (error) {
+                console.error('Payment error:', error);
+                showMessage('payment-message', error.message, 'error');
+            } finally {
+                submitButton.disabled = false;
+                const spinner = document.getElementById('spinner');
+                if (spinner) spinner.style.display = 'none';
+                updateButtonText();
+                updateConnectionStatus('online');
+            }
+        }
+        
+        async function handleMotoSubmit(event) {
+            event.preventDefault();
+            
+            if (!validateMotoForm()) {
+                showMessage('moto-message', 'Please fix the errors in the form before submitting.', 'error');
+                return;
+            }
+
+            const submitButton = document.getElementById('moto-submit-button');
+            const spinner = document.getElementById('moto-spinner');
+            
+            submitButton.disabled = true;
+            if (spinner) spinner.style.display = 'block';
+            document.getElementById('moto-button-text').textContent = 'Processing...';
+            updateConnectionStatus('processing');
+
+            try {
+                const amount = parseInt(document.getElementById('moto-amount').value, 10);
+                const billingDetails = {
+                    name: document.getElementById('moto-name').value.trim(),
+                    email: document.getElementById('moto-email').value.trim(),
+                    address: {
+                        line1: document.getElementById('moto-line1').value.trim(),
+                        line2: document.getElementById('moto-line2').value.trim(),
+                        city: document.getElementById('moto-city').value.trim(),
+                        state: document.getElementById('moto-state').value.trim(),
+                        postal_code: document.getElementById('moto-postal_code').value.trim(),
+                        country: document.getElementById('moto-country').value,
+                    }
+                };
+
+                const type = motoTransactionType === 'moto-pre-auth' ? 'pre-auth' : 'payment';
+                
+                const { clientSecret, approvalCode } = await createPaymentIntent(
+                    amount,
+                    type,
+                    billingDetails,
+                    true
+                );
+
+                const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+                    payment_method: {
+                        card: {
+                            number: document.getElementById('moto-card-number').value.replace(/\s/g, ''),
+                            exp_month: parseInt(document.getElementById('moto-card-expiry').value.split('/')[0], 10),
+                            exp_year: parseInt('20' + document.getElementById('moto-card-expiry').value.split('/')[1], 10),
+                            cvc: document.getElementById('moto-card-cvc').value
+                        },
+                        billing_details: billingDetails
+                    }
+                });
+
+                if (error) {
+                    throw new Error(error.message);
+                } else {
+                    handleMotoPaymentSuccess(paymentIntent, approvalCode);
+                }
+
+            } catch (error) {
+                console.error('MOTO payment error:', error);
+                showMessage('moto-message', error.message, 'error');
+            } finally {
+                submitButton.disabled = false;
+                const spinner = document.getElementById('moto-spinner');
+                if (spinner) spinner.style.display = 'none';
+                updateMotoButtonText();
+                updateConnectionStatus('online');
+            }
+        }
+        
+        async function handleCaptureSubmit(event) {
+            event.preventDefault();
+            
+            const paymentIntentId = document.getElementById('payment-intent-id').value.trim();
+            const captureAmount = parseInt(document.getElementById('capture-amount').value, 10);
+            
+            if (!paymentIntentId || !captureAmount) {
+                showMessage('capture-message', 'Please provide both Payment Intent ID and capture amount.', 'error');
+                return;
+            }
+
+            const captureButton = document.getElementById('capture-button');
+            const spinner = document.getElementById('capture-spinner');
+            
+            captureButton.disabled = true;
+            if (spinner) spinner.style.display = 'block';
+            document.getElementById('capture-button-text').textContent = 'Processing...';
+            updateConnectionStatus('processing');
+
+            try {
+                const response = await fetch(`${CONFIG.backendUrl}/api/capture-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        paymentIntentId: paymentIntentId,
+                        amount: captureAmount
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Capture failed');
+                }
+
+                const result = await response.json();
+                
+                const message = `Payment captured successfully!<br>
+                                <div class="approval-section">
+                                    <span class="approval-code-label">Capture Approval Code:</span>
+                                    <span class="approval-code">${result.approval_code}</span><br>
+                                    Amount: $${result.amount_captured.toLocaleString()}<br>
+                                    Status: ${result.status}
+                                </div>`;
+                
+                showMessage('capture-message', message, 'success');
+                
+                document.getElementById('payment-intent-id').value = '';
+                document.getElementById('capture-amount').value = '';
+                
+                loadPendingTransactions();
+            } catch (error) {
+                console.error('Capture error:', error);
+                showMessage('capture-message', error.message, 'error');
+            } finally {
+                captureButton.disabled = false;
+                if (spinner) spinner.style.display = 'none';
+                document.getElementById('capture-button-text').textContent = 'Capture Funds';
+                updateConnectionStatus('online');
+            }
+        }
+        
+        function updateTransactionUI() {
+            const preAuthInfo = document.getElementById('pre-auth-info');
+            const displayType = document.getElementById('display-type');
+            const submitButton = document.getElementById('submit-button');
+            
+            if (transactionType === 'pre-auth') {
+                if (preAuthInfo) preAuthInfo.classList.add('show');
+                if (displayType) displayType.textContent = 'Pre-Authorization';
+                if (submitButton) submitButton.classList.add('warning');
+            } else {
+                if (preAuthInfo) preAuthInfo.classList.remove('show');
+                if (displayType) displayType.textContent = 'Payment';
+                if (submitButton) submitButton.classList.remove('warning');
+            }
+            
+            updateButtonText();
+        }
+
+        function updateMotoTransactionUI() {
+            const displayType = document.getElementById('moto-display-type');
+            const submitButton = document.getElementById('moto-submit-button');
+            
+            if (motoTransactionType === 'moto-pre-auth') {
+                if (displayType) displayType.textContent = 'MOTO Pre-Authorization';
+                if (submitButton) submitButton.classList.add('info');
+            } else {
+                if (displayType) displayType.textContent = 'MOTO Payment';
+                if (submitButton) submitButton.classList.remove('info');
+            }
+            
+            updateMotoButtonText();
+        }
+
+        function updateButtonText() {
+            const amount = parseInt(document.getElementById('amount')?.value || 0, 10);
+            const action = transactionType === 'pre-auth' ? 'Authorize' : 'Pay';
+            const buttonText = document.getElementById('button-text');
+            if (buttonText) {
+                buttonText.textContent = `${action} $${amount.toLocaleString()}`;
+            }
+        }
+
+        function updateMotoButtonText() {
+            const amount = parseInt(document.getElementById('moto-amount')?.value || 0, 10);
+            const action = motoTransactionType === 'moto-pre-auth' ? 'Authorize' : 'Process';
+            const buttonText = document.getElementById('moto-button-text');
+            if (buttonText) {
+                buttonText.textContent = `${action} MOTO $${amount.toLocaleString()}`;
+            }
+        }
+        
+        function validateForm() {
+            let isValid = true;
+            
+            const amount = parseInt(document.getElementById('amount').value, 10);
+            if (!amount || amount < 1 || amount > 999999) {
+                document.getElementById('amount-error').classList.add('show');
+                isValid = false;
+            } else {
+                document.getElementById('amount-error').classList.remove('show');
+            }
+            
+            const requiredFields = ['name', 'email', 'line1', 'city', 'state', 'postal_code', 'country'];
+            requiredFields.forEach(field => {
+                const element = document.getElementById(field);
+                const errorElement = document.getElementById(`${field}-error`);
+                
+                if (!element.value.trim()) {
+                    element.classList.add('error');
+                    if (errorElement) errorElement.classList.add('show');
+                    isValid = false;
+                } else {
+                    element.classList.remove('error');
+                    if (errorElement) errorElement.classList.remove('show');
+                }
+            });
+            
+            const email = document.getElementById('email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                document.getElementById('email-error').classList.add('show');
+                isValid = false;
+            }
+            
+            const cardErrors = document.getElementById('card-errors');
+            if (cardErrors.textContent) {
+                isValid = false;
+            }
+            
+            document.getElementById('submit-button').disabled = !isValid;
+            
+            return isValid;
+        }
+
+        function validateMotoForm() {
+            let isValid = true;
+            
+            const amount = parseInt(document.getElementById('moto-amount').value, 10);
+            if (!amount || amount < 1 || amount > 999999) {
+                document.getElementById('moto-amount-error').classList.add('show');
+                isValid = false;
+            } else {
+                document.getElementById('moto-amount-error').classList.remove('show');
+            }
+            
+            const motoRequiredFields = [
+                'moto-name', 'moto-email', 'moto-line1', 'moto-city', 'moto-state', 'moto-postal_code', 'moto-country',
+                'moto-card-number', 'moto-card-expiry', 'moto-card-cvc'
+            ];
+            motoRequiredFields.forEach(field => {
+                const element = document.getElementById(field);
+                const errorElement = document.getElementById(`${field}-error`);
+                
+                if (!element.value.trim()) {
+                    element.classList.add('error');
+                    if (errorElement) errorElement.classList.add('show');
+                    isValid = false;
+                } else {
+                    element.classList.remove('error');
+                    if (errorElement) errorElement.classList.remove('show');
+                }
+            });
+            
+            const email = document.getElementById('moto-email').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (email && !emailRegex.test(email)) {
+                document.getElementById('moto-email-error').classList.add('show');
+                isValid = false;
+            }
+            
+            const cardNumber = document.getElementById('moto-card-number').value.replace(/\s/g, '');
+            if (cardNumber && !/^\d{13,19}$/.test(cardNumber)) {
+                document.getElementById('moto-card-number-error').classList.add('show');
+                isValid = false;
+            }
+            
+            const expiry = document.getElementById('moto-card-expiry').value;
+            if (expiry && !/^\d{2}\/\d{2}$/.test(expiry)) {
+                document.getElementById('moto-card-expiry-error').classList.add('show');
+                isValid = false;
+            }
+            
+            const cvc = document.getElementById('moto-card-cvc').value;
+            if (cvc && !/^\d{3,4}$/.test(cvc)) {
+                document.getElementById('moto-card-cvc-error').classList.add('show');
+                isValid = false;
+            }
+            
+            document.getElementById('moto-submit-button').disabled = !isValid;
+            
+            return isValid;
+        }
+        
+        async function createPaymentIntent(amount, type, billingDetails, isMoto) {
+            const response = await fetch(`${CONFIG.backendUrl}/api/create-payment-intent`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    amount: amount,
+                    capture_method: type === 'pre-auth' ? 'manual' : 'automatic',
+                    metadata: {
+                        is_moto: isMoto,
+                        customer_email: billingDetails.email,
+                        customer_name: billingDetails.name,
+                        billing_address: billingDetails.address
+                    }
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to create payment intent');
+            }
+
+            return await response.json();
+        }
+        
+        function handlePaymentSuccess(paymentIntent, approvalCode) {
+            const isPreAuth = transactionType === 'pre-auth';
+            
+            let message = '';
+            if (isPreAuth) {
+                message = `Pre-authorization successful!<br>
+                          <div class="approval-section">
+                              <span class="approval-code-label">Approval Code:</span>
+                              <span class="approval-code">${approvalCode}</span><br>
+                              Payment Intent ID: ${paymentIntent.id}<br>
+                              Status: ${paymentIntent.status}<br>
+                              You can capture the funds later.
+                          </div>`;
+            } else {
+                message = `Payment successful!<br>
+                          <div class="approval-section">
+                              <span class="approval-code-label">Approval Code:</span>
+                              <span class="approval-code">${approvalCode}</span><br>
+                              Transaction ID: ${paymentIntent.id}<br>
+                              Status: ${paymentIntent.status}
+                          </div>`;
+            }
+            
+            showMessage('payment-message', message, 'success');
+            
+            resetPaymentForm();
+            
+            if (isPreAuth) {
+                loadPendingTransactions();
+            }
+        }
+
+        function handleMotoPaymentSuccess(paymentIntent, approvalCode) {
+            const isPreAuth = motoTransactionType === 'moto-pre-auth';
+            
+            const manualApprovalCode = document.getElementById('manual-approval-code').value;
+            
+            let message = '';
+            if (isPreAuth) {
+                message = `MOTO Pre-authorization successful!<br>
+                          <div class="approval-section">
+                              <span class="approval-code-label">Approval Code:</span>
+                              <span class="approval-code">${approvalCode}</span><br>`;
+                
+                if (manualApprovalCode) {
+                    message += `<span class="approval-code-label">Manual Approval Code:</span>
+                              <span class="approval-code">${manualApprovalCode}</span><br>`;
+                }
+                
+                message += `Payment Intent ID: ${paymentIntent.id}<br>
+                              Status: ${paymentIntent.status}<br>
+                              You can capture the funds later.
+                          </div>`;
+            } else {
+                message = `MOTO Payment successful!<br>
+                          <div class="approval-section">
+                              <span class="approval-code-label">Approval Code:</span>
+                              <span class="approval-code">${approvalCode}</span><br>`;
+                
+                if (manualApprovalCode) {
+                    message += `<span class="approval-code-label">Manual Approval Code:</span>
+                              <span class="approval-code">${manualApprovalCode}</span><br>`;
+                }
+                
+                message += `Transaction ID: ${paymentIntent.id}<br>
+                              Status: ${paymentIntent.status}
+                          </div>`;
+            }
+            
+            showMessage('moto-message', message, 'success');
+            
+            resetMotoPaymentForm();
+            
+            if (isPreAuth) {
+                loadPendingTransactions();
+            }
+        }
+        
+        function showLoadingOverlay(message = 'Loading...') {
+            const overlay = document.getElementById('loading-overlay');
+            const loadingText = document.getElementById('loading-text');
+            if (overlay) {
+                if (loadingText) loadingText.textContent = message;
+                overlay.style.display = 'flex';
+            }
+        }
+
+        function hideLoadingOverlay() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+
+        function setupConnectionMonitoring() {
+            window.addEventListener('online', () => {
+                updateConnectionStatus('online');
+                showMessage('payment-message', 'Connection restored', 'success');
+                setTimeout(() => {
+                    const messageElement = document.getElementById('payment-message');
+                    if (messageElement && messageElement.textContent === 'Connection restored') {
+                        messageElement.style.display = 'none';
+                    }
+                }, 3000);
+            });
+            
+            window.addEventListener('offline', () => {
+                updateConnectionStatus('offline');
+                showMessage('payment-message', 'You are offline. Some features may not work.', 'warning');
+            });
+            
+            if (!navigator.onLine) {
+                updateConnectionStatus('offline');
+            }
+            
+            setInterval(async () => {
+                try {
+                    await checkBackendHealth();
+                    updateConnectionStatus('online');
+                } catch (error) {
+                    updateConnectionStatus('offline');
+                }
+            }, 30000);
+        }
+
+        function updateConnectionStatus(status) {
+            const connectionStatus = document.getElementById('connection-status');
+            if (!connectionStatus) return;
+            
+            switch(status) {
+                case 'online':
+                    connectionStatus.textContent = '🟢 Online';
+                    connectionStatus.className = 'online';
+                    connectionStatus.style.display = 'block';
+                    setTimeout(() => {
+                        if (connectionStatus.className === 'online') {
+                            connectionStatus.style.display = 'none';
+                        }
+                    }, 5000);
+                    break;
+                case 'offline':
+                    connectionStatus.textContent = '🔴 Offline - Check Connection';
+                    connectionStatus.className = 'offline';
+                    connectionStatus.style.display = 'block';
+                    break;
+                case 'initializing':
+                    connectionStatus.textContent = '🟠 Initializing Payment System...';
+                    connectionStatus.className = 'test-mode';
+                    connectionStatus.style.display = 'block';
+                    break;
+                case 'processing':
+                    connectionStatus.textContent = '🟠 Processing Transaction...';
+                    connectionStatus.className = 'processing';
+                    connectionStatus.style.display = 'block';
+                    break;
+                case 'error':
+                    connectionStatus.textContent = '🔴 System Error - Refresh Page';
+                    connectionStatus.className = 'error';
+                    connectionStatus.style.display = 'block';
+                    break;
+            }
+        }
+
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            element.innerHTML = message;
+            element.className = type;
+            element.style.display = 'block';
+
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (element.style.display === 'block') {
+                        element.style.display = 'none';
+                    }
+                }, 8000);
+            }
+        }
+
+        function resetPaymentForm() {
+            document.getElementById('amount').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('line1').value = '';
+            document.getElementById('line2').value = '';
+            document.getElementById('city').value = '';
+            document.getElementById('state').value = '';
+            document.getElementById('postal_code').value = '';
+            document.getElementById('country').value = 'US';
+            
+            if (cardElement) {
+                cardElement.clear();
+            }
+            
+            document.getElementById('display-amount').textContent = '$0';
+            document.getElementById('display-total').textContent = '$0';
+            updateButtonText();
+            
+            validateForm();
+        }
+
+        function resetMotoPaymentForm() {
+            document.getElementById('moto-amount').value = '';
+            document.getElementById('moto-name').value = '';
+            document.getElementById('moto-email').value = '';
+            document.getElementById('moto-line1').value = '';
+            document.getElementById('moto-line2').value = '';
+            document.getElementById('moto-city').value = '';
+            document.getElementById('moto-state').value = '';
+            document.getElementById('moto-postal_code').value = '';
+            document.getElementById('moto-country').value = 'US';
+            document.getElementById('moto-card-number').value = '';
+            document.getElementById('moto-card-expiry').value = '';
+            document.getElementById('moto-card-cvc').value = '';
+            document.getElementById('manual-approval-code').value = '';
+            document.getElementById('offline-notes').value = '';
+            
+            document.getElementById('moto-display-amount').textContent = '$0';
+            document.getElementById('moto-display-total').textContent = '$0';
+            updateMotoButtonText();
+            
+            validateMotoForm();
+        }
+        
+        async function loadPendingTransactions() {
+            try {
+                const transactionList = document.getElementById('transaction-list');
+                const allTransactionsList = document.getElementById('all-transactions-list');
+                
+                if (transactionList) {
+                    transactionList.innerHTML = '<div class="empty-state">Loading transactions...</div>';
+                }
+                if (allTransactionsList) {
+                    allTransactionsList.innerHTML = '<div class="empty-state">Loading transactions...</div>';
+                }
+                
+                const response = await fetch(`${CONFIG.backendUrl}/api/transactions`);
+                
+                if (!response.ok) {
+                    throw new Error('Failed to load transactions');
+                }
+
+                const transactions = await response.json();
+                displayTransactions(transactions);
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                const transactionList = document.getElementById('transaction-list');
+                const allTransactionsList = document.getElementById('all-transactions-list');
+                if (transactionList) {
+                    transactionList.innerHTML = '<div class="empty-state">Error loading transactions</div>';
+                }
+                if (allTransactionsList) {
+                    allTransactionsList.innerHTML = '<div class="empty-state">Error loading transactions</div>';
+                }
+            }
+        }
+
+        function displayTransactions(transactions) {
+            const transactionList = document.getElementById('transaction-list');
+            const allTransactionsList = document.getElementById('all-transactions-list');
+            
+            if (!transactions || transactions.length === 0) {
+                if (transactionList) {
+                    transactionList.innerHTML = '<div class="empty-state">No recent pre-authorizations found</div>';
+                }
+                if (allTransactionsList) {
+                    allTransactionsList.innerHTML = '<div class="empty-state">No transactions found</div>';
+                }
+                return;
+            }
+            
+            const pendingTransactions = transactions.filter(t => t.status === 'requires_capture');
+            
+            if (transactionList) {
+                if (pendingTransactions.length === 0) {
+                    transactionList.innerHTML = '<div class="empty-state">No recent pre-authorizations found</div>';
+                } else {
+                    transactionList.innerHTML = pendingTransactions.map(transaction => `
+                        <div class="transaction-item">
+                            <div class="transaction-details">
+                                <div class="transaction-amount">$${transaction.amount.toLocaleString()}</div>
+                                <div class="transaction-id">${transaction.id}</div>
+                                <div class="approval-section">
+                                    <span class="approval-code-label">Approval Code:</span>
+                                    <span class="approval-code">${transaction.approval_code || 'Pending'}</span>
+                                </div>
+                                <div>Status: ${formatStatus(transaction.status)}</div>
+                                <div>Created: ${new Date(transaction.created * 1000).toLocaleDateString()}</div>
+                                <div>Type: ${transaction.metadata?.is_moto ? 'MOTO' : 'Regular'}</div>
+                            </div>
+                            <div class="transaction-actions">
+                                <button class="btn-small success" onclick="captureTransaction('${transaction.id}', ${transaction.amount * 100})">
+                                    Capture
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            }
+            
+            if (allTransactionsList) {
+                allTransactionsList.innerHTML = transactions.map(transaction => `
+                    <div class="transaction-item">
+                        <div class="transaction-details">
+                            <div class="transaction-amount">$${transaction.amount.toLocaleString()}</div>
+                            <div class="transaction-id">${transaction.id}</div>
+                            <div class="approval-section">
+                                <span class="approval-code-label">Approval Code:</span>
+                                <span class="approval-code">${transaction.approval_code || 'N/A'}</span>
+                            </div>
+                            <div>Status: ${formatStatus(transaction.status)}</div>
+                            <div>Type: ${transaction.capture_method === 'manual' ? 'Pre-Authorization' : 'Payment'}</div>
+                            <div>Method: ${transaction.metadata?.is_moto ? 'MOTO' : 'Regular'}</div>
+                            <div>Created: ${new Date(transaction.created * 1000).toLocaleDateString()}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function formatStatus(status) {
+            const statusMap = {
+                'requires_payment_method': 'Payment Method Required',
+                'requires_confirmation': 'Requires Confirmation',
+                'requires_action': 'Requires Action',
+                'processing': 'Processing',
+                'requires_capture': 'Pending Capture',
+                'canceled': 'Canceled',
+                'succeeded': 'Completed'
+            };
+            
+            return statusMap[status] || status;
+        }
+        
+        window.captureTransaction = function(paymentIntentId, amount) {
+            document.getElementById('payment-intent-id').value = paymentIntentId;
+            document.getElementById('capture-amount').value = amount / 100;
+            
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector('[data-tab="capture"]').classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById('capture-tab').classList.add('active');
+        };
+    </script>
+</body>
+</html>
